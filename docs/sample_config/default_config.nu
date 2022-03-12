@@ -1,7 +1,7 @@
 # Nushell Config File
 
 def create_left_prompt [] {
-    let path_segment = ($nu.cwd)
+    let path_segment = ($env.PWD)
 
     $path_segment
 }
@@ -28,6 +28,7 @@ let-env PROMPT_MULTILINE_INDICATOR = "::: "
 # Specifies how environment variables are:
 # - converted from a string to a value on Nushell startup (from_string)
 # - converted from a value back to a string when running extrnal commands (to_string)
+# Note: The conversions happen *after* config.nu is loaded
 let-env ENV_CONVERSIONS = {
   "PATH": {
     from_string: { |s| $s | split row (char esep) }
@@ -197,7 +198,7 @@ let $config = {
       name: completion_menu
       modifier: none
       keycode: tab
-      mode: emacs # emacs vi_normal vi_insert
+      mode: emacs # Options: emacs vi_normal vi_insert
       event: {
         until: [
           { send: menu name: completion_menu }
@@ -209,14 +210,14 @@ let $config = {
       name: completion_previous
       modifier: shift
       keycode: backtab
-      mode: emacs # emacs vi_normal vi_insert
+      mode: [emacs, vi_normal, vi_insert] # Note: You can add the same keybinding to all modes by using a list
       event: { send: menuprevious }
     }
     {
       name: history_menu
       modifier: control
       keycode: char_x
-      mode: emacs # emacs vi_normal vi_insert
+      mode: emacs
       event: {
         until: [
           { send: menu name: history_menu }
@@ -228,11 +229,11 @@ let $config = {
       name: history_previous
       modifier: control
       keycode: char_z
-      mode: emacs # emacs vi_normal vi_insert
+      mode: emacs 
       event: {
         until: [
           { send: menupageprevious }
-          { send: edit, cmd: undo }
+          { edit: { cmd: undo } }
         ]
       }
     }
